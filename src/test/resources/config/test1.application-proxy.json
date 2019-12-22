@@ -1,0 +1,11 @@
+{
+  "application": "TEST1",
+  "scheme": "https",
+  "server": "jimrennie.com",
+  "port": 8080,
+  "headerBlacklist": [
+    "cookie",
+    "accept-encoding"
+  ],
+  "pollingIntervalMinutes": 15
+}
