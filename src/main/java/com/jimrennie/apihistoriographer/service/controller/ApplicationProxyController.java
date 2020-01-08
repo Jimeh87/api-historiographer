@@ -1,7 +1,5 @@
 package com.jimrennie.apihistoriographer.service.controller;
 
-import com.jimrennie.apihistoriographer.service.core.ApplicationHeaderService;
-import com.jimrennie.apihistoriographer.service.core.ApplicationUriService;
 import com.jimrennie.apihistoriographer.service.core.ProxyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,13 +19,14 @@ import java.util.regex.Pattern;
 @RestController
 public class ApplicationProxyController {
 
-	public static final Pattern URL_PROXY_PATTERN = Pattern.compile("^\\/api\\/v1\\/applications\\/.+\\/proxy(\\/.*)$");
+	// TODO: Add lookahead and require slash after proxy if additional data exists
+	public static final Pattern URL_PROXY_PATTERN = Pattern.compile("^\\/api\\/v1\\/applications\\/.+\\/proxy\\/?(.*)$");
 
 	@Autowired
 	private ProxyService proxyService;
 
 	@RequestMapping("/**")
-	public ResponseEntity<String> proxy(@PathVariable("application") String application, @RequestBody(required = false) String body, HttpMethod method, HttpServletRequest request, HttpServletResponse httpServletResponse) {
+	public ResponseEntity<String> proxy(@PathVariable("application") String application, @RequestBody(required = false) String body, HttpMethod method, HttpServletRequest request) {
 		return proxyService.proxyBuilder()
 			.application(application)
 			.method(method)
