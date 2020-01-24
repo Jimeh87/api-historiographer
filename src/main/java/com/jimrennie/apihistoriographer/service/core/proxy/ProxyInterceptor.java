@@ -1,6 +1,8 @@
-package com.jimrennie.apihistoriographer.service.core;
+package com.jimrennie.apihistoriographer.service.core.proxy;
 
-import com.jimrennie.apihistoriographer.service.core.config.ApplicationProxyConfigService;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationHeaderService;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationProxyService;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationUriService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -9,13 +11,12 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 public class ProxyInterceptor implements ClientHttpRequestInterceptor {
 
 	@Autowired
-	private ApplicationProxyConfigService applicationProxyConfigService;
+	private ApplicationProxyService applicationProxyService;
 	@Autowired
 	private ApplicationUriService applicationUriService;
 	@Autowired

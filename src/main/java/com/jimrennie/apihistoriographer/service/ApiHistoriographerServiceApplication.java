@@ -1,6 +1,6 @@
 package com.jimrennie.apihistoriographer.service;
 
-import com.jimrennie.apihistoriographer.service.core.ProxyInterceptor;
+import com.jimrennie.apihistoriographer.service.core.proxy.ProxyInterceptor;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

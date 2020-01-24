@@ -1,4 +1,4 @@
-package com.jimrennie.apihistoriographer.service.core.config;
+package com.jimrennie.apihistoriographer.service.controller.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -10,11 +10,11 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ApplicationProxyConfig {
+public class ApplicationProxyDto {
 	private String application;
 	private String scheme = "http";
 	private String host;
 	private int port = 80;
 	private List<String> headerBlacklist = new ArrayList<>();
-	private int pollingIntervalMinutes = 60;
+	private List<ApplicationObserverDto> observers = new ArrayList<>();
 }

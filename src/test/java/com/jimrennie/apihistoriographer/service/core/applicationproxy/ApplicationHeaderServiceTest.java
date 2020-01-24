@@ -1,7 +1,8 @@
-package com.jimrennie.apihistoriographer.service.core;
+package com.jimrennie.apihistoriographer.service.core.applicationproxy;
 
-import com.jimrennie.apihistoriographer.service.core.config.ApplicationProxyConfig;
-import com.jimrennie.apihistoriographer.service.core.config.ApplicationProxyConfigService;
+import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationHeaderService;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationProxyService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +23,16 @@ import static org.mockito.Mockito.when;
 class ApplicationHeaderServiceTest {
 
 	@MockBean
-	private ApplicationProxyConfigService applicationProxyConfigService;
+	private ApplicationProxyService applicationProxyService;
 	@Autowired
 	private ApplicationHeaderService applicationHeaderService;
 
 	@Test
 	void testApplicationUriService() {
-		when(applicationProxyConfigService.getConfig(any())).thenReturn(
-				new ApplicationProxyConfig()
+		when(applicationProxyService.getConfig(any())).thenReturn(
+				new ApplicationProxyDto()
 						.setApplication("ANY")
+						.setHost("asdf")
 						.setHeaderBlacklist(Arrays.asList("foo", "bar")));
 
 		HttpHeaders headers = new HttpHeaders();

@@ -1,6 +1,6 @@
 package com.jimrennie.apihistoriographer.service.controller;
 
-import com.jimrennie.apihistoriographer.service.core.ProxyService;
+import com.jimrennie.apihistoriographer.service.core.proxy.ProxyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

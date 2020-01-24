@@ -1,7 +1,6 @@
-package com.jimrennie.apihistoriographer.service.core;
+package com.jimrennie.apihistoriographer.service.core.applicationproxy;
 
-import com.jimrennie.apihistoriographer.service.core.config.ApplicationProxyConfig;
-import com.jimrennie.apihistoriographer.service.core.config.ApplicationProxyConfigService;
+import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,11 +12,11 @@ import java.net.URI;
 public class ApplicationUriService {
 	
 	@Autowired
-	private ApplicationProxyConfigService applicationProxyConfigService;
+	private ApplicationProxyService applicationProxyService;
 
 	@SneakyThrows
 	public URI create(String application, String path, String query) {
-		ApplicationProxyConfig appConfig = applicationProxyConfigService.getConfig(application);
+		ApplicationProxyDto appConfig = applicationProxyService.getConfig(application);
 		return UriComponentsBuilder.newInstance()
 				.scheme(appConfig.getScheme())
 				.host(appConfig.getHost())

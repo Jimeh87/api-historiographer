@@ -1,5 +1,6 @@
-package com.jimrennie.apihistoriographer.service.core.config;
+package com.jimrennie.apihistoriographer.service.core.applicationproxy;
 
+import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
 import com.jimrennie.apihistoriographer.service.util.ResourceDirectory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,21 +13,21 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 @Service
-public class ApplicationProxyConfigService {
+public class ApplicationProxyService {
 
 	@Autowired
 	private ResourceDirectory resourceDirectory;
 
-	private Map<String, ApplicationProxyConfig> proxyConfig;
+	private Map<String, ApplicationProxyDto> proxyConfig;
 
 	@PostConstruct
 	public void createProxyConfigMap() {
-		proxyConfig = resourceDirectory.read("config", "*.application-proxy.json", ApplicationProxyConfig.class)
+		proxyConfig = resourceDirectory.read("config", "*.application-proxy.json", ApplicationProxyDto.class)
 				.stream()
-				.collect(toMap(ApplicationProxyConfig::getApplication, identity()));
+				.collect(toMap(ApplicationProxyDto::getApplication, identity()));
 	}
 
-	public ApplicationProxyConfig getConfig(String application) {
+	public ApplicationProxyDto getConfig(String application) {
 		return Optional.ofNullable(proxyConfig.get(application))
 				.orElseThrow(() -> new IllegalArgumentException(String.format("Application [%s] not found", application)));
 	}

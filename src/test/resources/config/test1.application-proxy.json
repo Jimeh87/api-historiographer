@@ -1,7 +1,7 @@
 {
   "application": "TEST1",
   "scheme": "https",
-  "server": "jimrennie.com",
+  "host": "jimrennie.com",
   "port": 8080,
   "headerBlacklist": [
     "cookie",

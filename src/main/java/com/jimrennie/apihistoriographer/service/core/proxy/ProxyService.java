@@ -1,5 +1,7 @@
-package com.jimrennie.apihistoriographer.service.core;
+package com.jimrennie.apihistoriographer.service.core.proxy;
 
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationHeaderService;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationUriService;
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -37,7 +39,7 @@ public class ProxyService {
 		try {
 			return restTemplate.exchange(uri, method, new HttpEntity<>(body, headers), String.class);
 		} catch(HttpStatusCodeException e) {
-			return ResponseEntity.status(e.getRawStatusCode())
+			return ResponseEntity.status(e.getStatusCode())
 					.headers(e.getResponseHeaders())
 					.body(e.getResponseBodyAsString());
 		}

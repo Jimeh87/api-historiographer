@@ -1,7 +1,8 @@
-package com.jimrennie.apihistoriographer.service.core;
+package com.jimrennie.apihistoriographer.service.core.applicationproxy;
 
-import com.jimrennie.apihistoriographer.service.core.config.ApplicationProxyConfig;
-import com.jimrennie.apihistoriographer.service.core.config.ApplicationProxyConfigService;
+import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationProxyService;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationUriService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,14 @@ import static org.mockito.Mockito.when;
 class ApplicationUriServiceTest {
 
 	@MockBean
-	private ApplicationProxyConfigService applicationProxyConfigService;
+	private ApplicationProxyService applicationProxyService;
 	@Autowired
 	private ApplicationUriService applicationUriService;
 
 	@Test
 	void testApplicationUriService() {
-		when(applicationProxyConfigService.getConfig(any())).thenReturn(
-				new ApplicationProxyConfig()
+		when(applicationProxyService.getConfig(any())).thenReturn(
+				new ApplicationProxyDto()
 						.setApplication("ANY")
 						.setScheme("https")
 						.setHost("jimrennie.com")
@@ -39,8 +40,8 @@ class ApplicationUriServiceTest {
 
 	@Test
 	void testApplicationUriService_NoQueryOrPath() {
-		when(applicationProxyConfigService.getConfig(any())).thenReturn(
-				new ApplicationProxyConfig()
+		when(applicationProxyService.getConfig(any())).thenReturn(
+				new ApplicationProxyDto()
 						.setApplication("ANY")
 						.setScheme("https")
 						.setHost("jimrennie.com")

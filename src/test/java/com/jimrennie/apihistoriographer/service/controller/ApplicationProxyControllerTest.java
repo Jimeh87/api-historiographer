@@ -1,8 +1,9 @@
 package com.jimrennie.apihistoriographer.service.controller;
 
-import com.jimrennie.apihistoriographer.service.core.config.ApplicationProxyConfig;
-import com.jimrennie.apihistoriographer.service.core.config.ApplicationProxyConfigService;
+import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationProxyService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.client.MockServerClient;
@@ -37,13 +38,18 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 class ApplicationProxyControllerTest {
 
 	@MockBean
-	private ApplicationProxyConfigService applicationProxyConfigService;
+	private ApplicationProxyService applicationProxyService;
 	@Autowired
 	private TestRestTemplate testRestTemplate;
 	private final MockServerClient mockServerClient;
 
 	public ApplicationProxyControllerTest(MockServerClient mockServerClient) {
 		this.mockServerClient = mockServerClient;
+	}
+
+	@BeforeEach
+	void resetMockServerClient() {
+		mockServerClient.reset();
 	}
 
 	@Test
@@ -89,13 +95,13 @@ class ApplicationProxyControllerTest {
 		mockServerClient
 				.when(HttpRequest.request()
 						.withMethod("GET")
-						.withPath("")
+						.withPath("/QUERY-PARAMS")
 						.withQueryStringParameter("name", "jim")
 						.withQueryStringParameter("gender", "MALE"))
 				.respond(HttpResponse.response()
 						.withStatusCode(200));
 
-		ResponseEntity<Map<String, Object>> response = testRestTemplate.exchange("/api/v1/applications/mock-server/proxy?name=jim&gender=MALE", HttpMethod.GET, HttpEntity.EMPTY, mapType());
+		ResponseEntity<Map<String, Object>> response = testRestTemplate.exchange("/api/v1/applications/mock-server/proxy/QUERY-PARAMS?name=jim&gender=MALE", HttpMethod.GET, HttpEntity.EMPTY, mapType());
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
@@ -103,17 +109,18 @@ class ApplicationProxyControllerTest {
 	@Test
 	void testHeaders() {
 		withDefaultApplicationConfig();
+		// TODO : Need to verify blacklist header isn't sent
 		mockServerClient
 				.when(HttpRequest.request()
 						.withMethod("GET")
-						.withPath("")
+						.withPath("/HEADERS")
 						.withHeader("request-header", "hello"))
 				.respond(HttpResponse.response()
 						.withStatusCode(200)
 						.withHeader("response-header", "world"));
 
 		ResponseEntity<Map<String, Object>> response = testRestTemplate.exchange(
-				"/api/v1/applications/mock-server/proxy",
+				"/api/v1/applications/mock-server/proxy/HEADERS",
 				HttpMethod.GET,
 				new HttpEntity(new LinkedMultiValueMap<>(Map.of("request-header", List.of("hello"), "blacklisted-header", List.of("secret")))),
 				mapType()
@@ -129,8 +136,8 @@ class ApplicationProxyControllerTest {
 	}
 
 	private void withDefaultApplicationConfig() {
-		when(applicationProxyConfigService.getConfig(any())).thenReturn(
-				new ApplicationProxyConfig()
+		when(applicationProxyService.getConfig(any())).thenReturn(
+				new ApplicationProxyDto()
 						.setApplication("mock-server")
 						.setScheme("http")
 						.setHost(mockServerClient.remoteAddress().getHostName())
