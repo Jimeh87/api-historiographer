@@ -14,13 +14,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @MockServerSettings(ports = 666)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-public class ApplicationProxyControllerTest {
+class ApplicationProxyControllerTest {
 
 	@MockBean
 	private ApplicationProxyConfigService applicationProxyConfigService;
@@ -51,13 +51,13 @@ public class ApplicationProxyControllerTest {
 		withDefaultApplicationConfig();
 		mockServerClient
 				.when(HttpRequest.request()
-					.withMethod("GET")
-					.withPath(""))
+						.withMethod("GET")
+						.withPath(""))
 				.respond(HttpResponse.response()
-					.withStatusCode(200)
-					.withBody("{\"key\": \"value\"}"));
+						.withStatusCode(200)
+						.withBody("{\"key\": \"value\"}"));
 
-		ResponseEntity<Map<String, String>> response = testRestTemplate.exchange("/api/v1/applications/mock-server/proxy", HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<>() {});
+		ResponseEntity<Map<String, Object>> response = testRestTemplate.exchange("/api/v1/applications/mock-server/proxy", HttpMethod.GET, HttpEntity.EMPTY, mapType());
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
@@ -73,10 +73,10 @@ public class ApplicationProxyControllerTest {
 						.withPath("/POSTING")
 						.withBody("post body"))
 				.respond(HttpResponse.response()
-					.withStatusCode(201)
-					.withBody("{\"key\": \"value\"}"));
+						.withStatusCode(201)
+						.withBody("{\"key\": \"value\"}"));
 
-		ResponseEntity<Map<String, String>> response = testRestTemplate.exchange("/api/v1/applications/mock-server/proxy/POSTING", HttpMethod.POST, new HttpEntity<>("post body"), new ParameterizedTypeReference<>() {});
+		ResponseEntity<Map<String, Object>> response = testRestTemplate.exchange("/api/v1/applications/mock-server/proxy/POSTING", HttpMethod.POST, new HttpEntity<>("post body"), mapType());
 
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		assertNotNull(response.getBody());
@@ -95,7 +95,7 @@ public class ApplicationProxyControllerTest {
 				.respond(HttpResponse.response()
 						.withStatusCode(200));
 
-		ResponseEntity<Map<String, String>> response = testRestTemplate.exchange("/api/v1/applications/mock-server/proxy?name=jim&gender=MALE", HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<>() {});
+		ResponseEntity<Map<String, Object>> response = testRestTemplate.exchange("/api/v1/applications/mock-server/proxy?name=jim&gender=MALE", HttpMethod.GET, HttpEntity.EMPTY, mapType());
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
@@ -112,15 +112,20 @@ public class ApplicationProxyControllerTest {
 						.withStatusCode(200)
 						.withHeader("response-header", "world"));
 
-		ResponseEntity<Map<String, String>> response = testRestTemplate.exchange(
+		ResponseEntity<Map<String, Object>> response = testRestTemplate.exchange(
 				"/api/v1/applications/mock-server/proxy",
 				HttpMethod.GET,
 				new HttpEntity(new LinkedMultiValueMap<>(Map.of("request-header", List.of("hello"), "blacklisted-header", List.of("secret")))),
-				new ParameterizedTypeReference<>() {}
+				mapType()
 		);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals("world", response.getHeaders().get("response-header").get(0));
+	}
+
+	private ParameterizedTypeReference<Map<String, Object>> mapType() {
+		return new ParameterizedTypeReference<>() {
+		};
 	}
 
 	private void withDefaultApplicationConfig() {
