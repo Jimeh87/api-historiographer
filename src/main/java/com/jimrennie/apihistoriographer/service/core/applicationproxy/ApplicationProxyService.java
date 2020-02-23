@@ -1,35 +1,31 @@
 package com.jimrennie.apihistoriographer.service.core.applicationproxy;
 
 import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
-import com.jimrennie.apihistoriographer.service.util.ResourceDirectory;
+import com.jimrennie.apihistoriographer.service.core.applicationproxy.assembler.ApplicationProxyAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.Map;
-import java.util.Optional;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
+import javax.transaction.Transactional;
+import java.util.UUID;
 
 @Service
 public class ApplicationProxyService {
 
 	@Autowired
-	private ResourceDirectory resourceDirectory;
+	private ApplicationProxyAssembler applicationProxyAssembler;
+	@Autowired
+	private ApplicationProxyRepository applicationProxyRepository;
 
-	private Map<String, ApplicationProxyDto> proxyConfig;
-
-	@PostConstruct
-	public void createProxyConfigMap() {
-		proxyConfig = resourceDirectory.read("config", "*.application-proxy.json", ApplicationProxyDto.class)
-				.stream()
-				.collect(toMap(ApplicationProxyDto::getApplication, identity()));
+	public ApplicationProxyDto get(String application) {
+		return applicationProxyRepository.findByApplication(application)
+				.map(applicationProxyAssembler::disassemble)
+				.orElseThrow(() -> new IllegalArgumentException(String.format("Application [%s] not found", application)));
 	}
 
-	public ApplicationProxyDto getConfig(String application) {
-		return Optional.ofNullable(proxyConfig.get(application))
-				.orElseThrow(() -> new IllegalArgumentException(String.format("Application [%s] not found", application)));
+	@Transactional
+	public UUID save(ApplicationProxyDto applicationProxyDto) {
+		return applicationProxyRepository.save(applicationProxyAssembler.assemble(applicationProxyDto))
+				.getId();
 	}
 
 }

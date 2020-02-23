@@ -1,7 +1,7 @@
 package com.jimrennie.apihistoriographer.service.core.applicationproxy;
 
 import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
-import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationProxyService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,32 +14,48 @@ class ApplicationProxyServiceTest {
 	@Autowired
 	private ApplicationProxyService applicationProxyService;
 
+	@BeforeEach
+	void seedData() {
+		applicationProxyService.save(new ApplicationProxyDto()
+				.setApplication("TEST1")
+				.setScheme("https")
+				.setHost("jimrennie.com")
+				.setPort(8080)
+				.addHeaderBlacklist("cookie", "*")
+				.addHeaderBlacklist("accept-encoding", "*"));
+
+		applicationProxyService.save(new ApplicationProxyDto()
+				.setApplication("TEST2")
+				.setHost("foo"));
+	}
+
 	@Test
-	void testGetConfigWithAllValuesSet() {
-		ApplicationProxyDto config = applicationProxyService.getConfig("TEST1");
+	void testGetWithAllValuesSet() {
+		ApplicationProxyDto applicationProxy = applicationProxyService.get("TEST1");
 		assertAll(
-				() -> assertEquals("TEST1", config.getApplication()),
-				() -> assertEquals("https", config.getScheme()),
-				() -> assertEquals("jimrennie.com", config.getHost()),
-				() -> assertEquals(8080, config.getPort()),
-				() -> assertArrayEquals(new String[]{"cookie", "accept-encoding"}, config.getHeaderBlacklist().toArray(new String[0]))
+				() -> assertEquals("TEST1", applicationProxy.getApplication()),
+				() -> assertEquals("https", applicationProxy.getScheme()),
+				() -> assertEquals("jimrennie.com", applicationProxy.getHost()),
+				() -> assertEquals(8080, applicationProxy.getPort()),
+				() -> assertArrayEquals(new String[]{"cookie", "accept-encoding"}, applicationProxy.getHeaderBlacklist().keySet().toArray(new String[0]))
 		);
 	}
 
 	@Test
-	void testGetConfigWithNoValuesSet() {
-		ApplicationProxyDto config = applicationProxyService.getConfig("TEST2");
+	void testGetWithNoValuesSet() {
+		ApplicationProxyDto applicationProxy = applicationProxyService.get("TEST2");
 		assertAll(
-				() -> assertEquals("TEST2", config.getApplication()),
-				() -> assertEquals("http", config.getScheme()),
-				() -> assertNull(config.getHost()),
-				() -> assertEquals(80, config.getPort()),
-				() -> assertArrayEquals(new String[]{}, config.getHeaderBlacklist().toArray(new String[0]))
+				() -> assertEquals("TEST2", applicationProxy.getApplication()),
+				() -> assertEquals("http", applicationProxy.getScheme()),
+				() -> assertEquals("foo", applicationProxy.getHost()),
+				() -> assertEquals(80, applicationProxy.getPort()),
+				() -> assertArrayEquals(new String[]{}, applicationProxy.getHeaderBlacklist().keySet().toArray(new String[0]))
 		);
 	}
 
 	@Test
-	void testConfigDoesNotExist() {
-		assertThrows(IllegalArgumentException.class, () -> applicationProxyService.getConfig("YUNOEXISTCONFIG"));
+	void testGetDoesNotExist() {
+		assertThrows(IllegalArgumentException.class, () -> applicationProxyService.get("YUNOEXIST"));
 	}
+
 }

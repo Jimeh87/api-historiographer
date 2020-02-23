@@ -1,7 +1,6 @@
 package com.jimrennie.apihistoriographer.service.controller;
 
 import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
-import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationProxyService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -27,8 +25,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @Slf4j
@@ -37,8 +33,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ApplicationProxyControllerTest {
 
-	@MockBean
-	private ApplicationProxyService applicationProxyService;
 	@Autowired
 	private TestRestTemplate testRestTemplate;
 	private final MockServerClient mockServerClient;
@@ -54,7 +48,7 @@ class ApplicationProxyControllerTest {
 
 	@Test
 	void testGet() {
-		withDefaultApplicationConfig();
+		createMockServerApplicationProxy();
 		mockServerClient
 				.when(HttpRequest.request()
 						.withMethod("GET")
@@ -72,7 +66,7 @@ class ApplicationProxyControllerTest {
 
 	@Test
 	void testPost() {
-		withDefaultApplicationConfig();
+		createMockServerApplicationProxy();
 		mockServerClient
 				.when(HttpRequest.request()
 						.withMethod("POST")
@@ -91,7 +85,7 @@ class ApplicationProxyControllerTest {
 
 	@Test
 	void testQueryParams() {
-		withDefaultApplicationConfig();
+		createMockServerApplicationProxy();
 		mockServerClient
 				.when(HttpRequest.request()
 						.withMethod("GET")
@@ -108,7 +102,7 @@ class ApplicationProxyControllerTest {
 
 	@Test
 	void testHeaders() {
-		withDefaultApplicationConfig();
+		createMockServerApplicationProxy();
 		// TODO : Need to verify blacklist header isn't sent
 		mockServerClient
 				.when(HttpRequest.request()
@@ -130,19 +124,19 @@ class ApplicationProxyControllerTest {
 		assertEquals("world", response.getHeaders().get("response-header").get(0));
 	}
 
-	private ParameterizedTypeReference<Map<String, Object>> mapType() {
+	private static ParameterizedTypeReference<Map<String, Object>> mapType() {
 		return new ParameterizedTypeReference<>() {
 		};
 	}
 
-	private void withDefaultApplicationConfig() {
-		when(applicationProxyService.getConfig(any())).thenReturn(
-				new ApplicationProxyDto()
-						.setApplication("mock-server")
-						.setScheme("http")
-						.setHost(mockServerClient.remoteAddress().getHostName())
-						.setPort(mockServerClient.remoteAddress().getPort())
-						.setHeaderBlacklist(List.of("blacklisted-header")));
+	private void createMockServerApplicationProxy() {
+		ApplicationProxyDto proxy = new ApplicationProxyDto()
+				.setApplication("mock-server")
+				.setScheme("http")
+				.setHost(mockServerClient.remoteAddress().getHostName())
+				.setPort(mockServerClient.remoteAddress().getPort())
+				.addHeaderBlacklist("blacklisted-header", ".*");
+		testRestTemplate.put("/api/v1/applications/mock-server", proxy);
 	}
 
 }

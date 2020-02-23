@@ -1,8 +1,6 @@
 package com.jimrennie.apihistoriographer.service.core.applicationproxy;
 
 import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
-import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationHeaderService;
-import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationProxyService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +27,13 @@ class ApplicationHeaderServiceTest {
 
 	@Test
 	void testApplicationUriService() {
-		when(applicationProxyService.getConfig(any())).thenReturn(
+		when(applicationProxyService.get(any())).thenReturn(
 				new ApplicationProxyDto()
 						.setApplication("ANY")
 						.setHost("asdf")
-						.setHeaderBlacklist(Arrays.asList("foo", "bar")));
+						.addHeaderBlacklist("foo", "*")
+						.addHeaderBlacklist("bar", "*"));
+
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("bar", "barValue");

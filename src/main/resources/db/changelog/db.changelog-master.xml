@@ -2,11 +2,7 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
-    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
-    http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd ">
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <changeSet id="create-app-proxy" author="jimeh87">
         <createTable tableName="application_proxy">
@@ -25,6 +21,7 @@
             <column name="port" type="int">
                 <constraints nullable="false"/>
             </column>
+            <column name="header_blacklist" type="varchar(512)"/>
         </createTable>
     </changeSet>
 
@@ -41,9 +38,14 @@
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
+            <column name="key" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="headers" type="varchar(512)"/>
             <column name="path" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="query_parameters" type="varchar(512)"/>
             <column name="method" type="varchar(10)">
                 <constraints nullable="false"/>
             </column>
@@ -51,28 +53,9 @@
             <column name="polling_interval_minutes" type="int">
                 <constraints nullable="false"/>
             </column>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="create-rest-parameters" author="jimeh87">
-        <createTable tableName="rest_parameter">
-            <column name="id" type="varchar(36)">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="parameter_key" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="parameter_value" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="query_param_app_observer_id" type="varchar(36)">
-                <constraints referencedTableName="application_observer" referencedColumnNames="id" foreignKeyName="fk_query_param_app_observer"/>
-            </column>
-            <column name="header_app_observer_id" type="varchar(36)">
-                <constraints referencedTableName="application_observer" referencedColumnNames="id" foreignKeyName="fk_header_app_observer"/>
-            </column>
-            <column name="header_blacklist_app_proxy_id" type="varchar(36)">
-                <constraints nullable="false" referencedTableName="application_proxy" referencedColumnNames="id" foreignKeyName="fk_header_bl_app_proxy"/>
+            <column name="application_proxy_id" type="varchar(36)">
+                <constraints referencedTableName="application_proxy" referencedColumnNames="id"
+                             foreignKeyName="fk_observer_app_proxy"/>
             </column>
         </createTable>
     </changeSet>

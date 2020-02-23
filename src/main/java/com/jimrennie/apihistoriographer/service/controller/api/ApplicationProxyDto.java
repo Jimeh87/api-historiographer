@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Accessors(chain = true)
@@ -15,6 +17,18 @@ public class ApplicationProxyDto {
 	private String scheme = "http";
 	private String host;
 	private int port = 80;
-	private List<String> headerBlacklist = new ArrayList<>();
+	private Map<String, List<String>> headerBlacklist = new HashMap<>();
 	private List<ApplicationObserverDto> observers = new ArrayList<>();
+
+	public ApplicationProxyDto addHeaderBlacklist(String key, String regexValue) {
+		headerBlacklist.compute(key, (k, v) -> {
+			if (v == null) {
+				v = new ArrayList<>();
+			}
+			v.add(regexValue);
+			return v;
+		});
+
+		return this;
+	}
 }

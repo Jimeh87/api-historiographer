@@ -1,8 +1,6 @@
 package com.jimrennie.apihistoriographer.service.core.applicationproxy;
 
 import com.jimrennie.apihistoriographer.service.controller.api.ApplicationProxyDto;
-import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationProxyService;
-import com.jimrennie.apihistoriographer.service.core.applicationproxy.ApplicationUriService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +25,7 @@ class ApplicationUriServiceTest {
 
 	@Test
 	void testApplicationUriService() {
-		when(applicationProxyService.getConfig(any())).thenReturn(
+		when(applicationProxyService.get(any())).thenReturn(
 				new ApplicationProxyDto()
 						.setApplication("ANY")
 						.setScheme("https")
@@ -40,7 +38,7 @@ class ApplicationUriServiceTest {
 
 	@Test
 	void testApplicationUriService_NoQueryOrPath() {
-		when(applicationProxyService.getConfig(any())).thenReturn(
+		when(applicationProxyService.get(any())).thenReturn(
 				new ApplicationProxyDto()
 						.setApplication("ANY")
 						.setScheme("https")

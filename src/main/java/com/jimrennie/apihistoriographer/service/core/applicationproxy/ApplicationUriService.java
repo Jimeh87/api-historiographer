@@ -10,17 +10,17 @@ import java.net.URI;
 
 @Service
 public class ApplicationUriService {
-	
+
 	@Autowired
 	private ApplicationProxyService applicationProxyService;
 
 	@SneakyThrows
 	public URI create(String application, String path, String query) {
-		ApplicationProxyDto appConfig = applicationProxyService.getConfig(application);
+		ApplicationProxyDto applicationProxy = applicationProxyService.get(application);
 		return UriComponentsBuilder.newInstance()
-				.scheme(appConfig.getScheme())
-				.host(appConfig.getHost())
-				.port(appConfig.getPort())
+				.scheme(applicationProxy.getScheme())
+				.host(applicationProxy.getHost())
+				.port(applicationProxy.getPort())
 				.path(path)
 				.query(query)
 				.build(true)
