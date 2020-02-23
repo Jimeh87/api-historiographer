@@ -54,10 +54,6 @@ public class ApplicationObserver {
 	@Basic(fetch = FetchType.EAGER)
 	private String body;
 
-	@Setter
-	@Column(name = "polling_interval_minutes", nullable = false)
-	private Integer pollingIntervalMinutes;
-
 	ApplicationObserver() {
 	}
 

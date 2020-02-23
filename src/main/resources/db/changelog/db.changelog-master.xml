@@ -50,9 +50,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="body" type="clob"/>
-            <column name="polling_interval_minutes" type="int">
-                <constraints nullable="false"/>
-            </column>
             <column name="application_proxy_id" type="varchar(36)">
                 <constraints referencedTableName="application_proxy" referencedColumnNames="id"
                              foreignKeyName="fk_observer_app_proxy"/>
